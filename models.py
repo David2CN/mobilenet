@@ -1,4 +1,5 @@
-from torch.nn import Module, Conv2d, BatchNorm2d, ReLU, AvgPool2d, Linear, Flatten
+from torch.nn import Module, Conv2d, BatchNorm2d
+from torch.nn import ReLU, AvgPool2d, Linear, Flatten
 
 
 class DSConvModule(Module):
@@ -46,7 +47,7 @@ class DSConvModuleBlock(Module):
         self.dsconv_b4= DSConvModule(512, 512, 3, stride=stride)
         self.dsconv_b5 = DSConvModule(512, 512, 3, stride=stride) 
 
-    def forward(self, x) -> None:
+    def forward(self, x):
         x = self.dsconv_b1(x)
         x = self.dsconv_b2(x)
         x = self.dsconv_b3(x)
@@ -57,11 +58,13 @@ class DSConvModuleBlock(Module):
 
 class MobileNet(Module):
     """
-    original mobilenet implementation
+    mobilenet
     """
-    def __init__(self, ):
+    def __init__(self, input_dim: int=3, classes: int=10):
         super().__init__()
-        self.conv1 = Conv2d(3, 32, kernel_size=3, stride=2, padding=1)
+        self.input_dim = input_dim
+        self.classes = classes
+        self.conv1 = Conv2d(self.input_dim, 32, kernel_size=3, stride=2, padding=1)
         self.dsconv1 = DSConvModule(32, 64, 3, stride=1)
         self.dsconv2 = DSConvModule(64, 128, 3, stride=2)
         self.dsconv3 = DSConvModule(128, 128, 3, stride=1)
@@ -73,7 +76,7 @@ class MobileNet(Module):
         self.dsconv9 = DSConvModule(1024, 1024, 3, stride=1)
         self.pool = AvgPool2d(7, stride=1)
         self.flatten = Flatten()
-        self.fc = Linear(1024, 1000)
+        self.fc = Linear(1024, self.classes)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -89,7 +92,4 @@ class MobileNet(Module):
         x = self.pool(x)
         x = self.flatten(x)
         x = self.fc(x)
-
         return x
-
-

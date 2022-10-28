@@ -52,10 +52,3 @@ data_sizes = {
 
 if __name__=="__main__":
     print(data_sizes)
-
-    data_iter = iter(train_loader)
-    # data_iter = iter(test_loader)
-    images, labels = data_iter.next()
-    images = images.numpy()
-    print(images[0].shape)
-    print(labels)

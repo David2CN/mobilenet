@@ -25,7 +25,7 @@ if cuda:
 
 
 # tensorboard logs
-run = "run3"
+run = "run1"
 writer =  SummaryWriter(f'logs/{run}')
 model_path = f"./models/{run}/"
 Path(model_path).mkdir(exist_ok=True)
@@ -33,12 +33,12 @@ Path(model_path).mkdir(exist_ok=True)
 initial_epochs = 0
 n_epochs = 20
 
-# train(model, data_loaders=data_loaders, data_sizes=data_sizes,
-#         optimizer=optimizer, criterion=criterion, epochs=n_epochs,
-#          model_path=model_path, writer=writer, initial_epochs=initial_epochs)
+train(model, data_loaders=data_loaders, data_sizes=data_sizes,
+        optimizer=optimizer, criterion=criterion, epochs=n_epochs,
+         model_path=model_path, writer=writer, initial_epochs=initial_epochs)
 
-best_model = r"./models\run3\model.10-0.7336.pt"
-model.load_state_dict(torch.load(best_model))
+# best_model = r"./models\run3\model.10-0.7336.pt"
+# model.load_state_dict(torch.load(best_model))
 
 test(model, data_loaders=data_loaders, writer=writer)
 

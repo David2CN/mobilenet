@@ -81,8 +81,6 @@ def train(model, data_loaders, data_sizes, optimizer,
             print(f"val_loss decreased from {val_loss_min:.4f} to {val_loss:.4f}. saving model ...")
             torch.save(model.state_dict(), f"{model_path}model.{epoch:02d}-{val_loss:.4f}.pt")
             val_loss_min = val_loss
-        
-    return 
 
 
 def test(model, data_loaders, writer=None):
