@@ -18,14 +18,17 @@ else:
 model = MobileNet()
 
 criterion = torch.nn.CrossEntropyLoss()
-optimizer = torch.optim.RMSprop(model.parameters(), lr=1e-4)
+
+lr = 1e-3
+decay = 1e-6
+optimizer = torch.optim.RMSprop(model.parameters(), lr=lr, weight_decay=decay, momentum=0.9)
 
 if cuda:
     model.cuda()
 
 
 # tensorboard logs
-run = "run1"
+run = "run2"
 writer =  SummaryWriter(f'logs/{run}')
 model_path = f"./models/{run}/"
 Path(model_path).mkdir(exist_ok=True)
@@ -33,12 +36,13 @@ Path(model_path).mkdir(exist_ok=True)
 initial_epochs = 0
 n_epochs = 20
 
-train(model, data_loaders=data_loaders, data_sizes=data_sizes,
-        optimizer=optimizer, criterion=criterion, epochs=n_epochs,
-         model_path=model_path, writer=writer, initial_epochs=initial_epochs)
+# train(model, data_loaders=data_loaders, data_sizes=data_sizes,
+#         optimizer=optimizer, criterion=criterion, epochs=n_epochs,
+#          model_path=model_path, writer=writer, initial_epochs=initial_epochs)
 
-# best_model = r"./models\run3\model.10-0.7336.pt"
-# model.load_state_dict(torch.load(best_model))
+
+best_model = r"./models\run2\model.17-0.4847.pt"
+model.load_state_dict(torch.load(best_model))
 
 test(model, data_loaders=data_loaders, writer=writer)
 
