@@ -1,8 +1,8 @@
-from torch.nn import Module, Conv2d, BatchNorm2d
+from torch.nn import Module, Conv2d, BatchNorm2d, ModuleList
 from torch.nn import ReLU, AvgPool2d, Linear, Flatten
 
 
-class DSConvModule(Module):
+class DSConvLayer(Module):
     """
     Module consists of a depthwise convolution layer
     and a pointwise convolution layer, both followed by 
@@ -37,22 +37,24 @@ class DSConvModule(Module):
 
 class DSConvModuleBlock(Module):
     """
-    5x DSConvModule
+    nx DSConvModule
     """
-    def __init__(self, in_channels: int, out_channels: int, kernel_size: int, stride: int=1) -> None:
+    def __init__(self, in_channels: int, out_channels: int, kernel_size: int, stride: int=1, n: int=5) -> None:
         super().__init__()
-        self.dsconv_b1 = DSConvModule(512, 512, 3, stride=stride)
-        self.dsconv_b2 = DSConvModule(512, 512, 3, stride=stride)
-        self.dsconv_b3 = DSConvModule(512, 512, 3, stride=stride)
-        self.dsconv_b4= DSConvModule(512, 512, 3, stride=stride)
-        self.dsconv_b5 = DSConvModule(512, 512, 3, stride=stride) 
+
+        block = [DSConvLayer(in_channels=in_channels,
+                                 out_channels=out_channels, 
+                                 kernel_size=kernel_size, 
+                                 stride=stride) 
+                    for _ in range(n)]
+
+        self.block = ModuleList(block)
 
     def forward(self, x):
-        x = self.dsconv_b1(x)
-        x = self.dsconv_b2(x)
-        x = self.dsconv_b3(x)
-        x = self.dsconv_b4(x)
-        x = self.dsconv_b5(x)
+        
+        for conv in self.block:
+            x = conv(x)
+
         return x
 
 
@@ -65,15 +67,15 @@ class MobileNet(Module):
         self.input_dim = input_dim
         self.classes = classes
         self.conv1 = Conv2d(self.input_dim, 32, kernel_size=3, stride=2, padding=1)
-        self.dsconv1 = DSConvModule(32, 64, 3, stride=1)
-        self.dsconv2 = DSConvModule(64, 128, 3, stride=2)
-        self.dsconv3 = DSConvModule(128, 128, 3, stride=1)
-        self.dsconv4 = DSConvModule(128, 256, 3, stride=2)
-        self.dsconv5 = DSConvModule(256, 256, 3, stride=1)
-        self.dsconv6 = DSConvModule(256, 512, 3, stride=2)
+        self.dsconv1 = DSConvLayer(32, 64, 3, stride=1)
+        self.dsconv2 = DSConvLayer(64, 128, 3, stride=2)
+        self.dsconv3 = DSConvLayer(128, 128, 3, stride=1)
+        self.dsconv4 = DSConvLayer(128, 256, 3, stride=2)
+        self.dsconv5 = DSConvLayer(256, 256, 3, stride=1)
+        self.dsconv6 = DSConvLayer(256, 512, 3, stride=2)
         self.dsconv7 = DSConvModuleBlock(512, 512, 3, stride=1)
-        self.dsconv8 = DSConvModule(512, 1024, 3, stride=2)
-        self.dsconv9 = DSConvModule(1024, 1024, 3, stride=1)
+        self.dsconv8 = DSConvLayer(512, 1024, 3, stride=2)
+        self.dsconv9 = DSConvLayer(1024, 1024, 3, stride=1)
         self.pool = AvgPool2d(7, stride=1)
         self.flatten = Flatten()
         self.fc = Linear(1024, self.classes)
