@@ -25,19 +25,19 @@ optimizer = torch.optim.RMSprop(model.parameters(), lr=lr, weight_decay=decay, m
 criterion = torch.nn.CrossEntropyLoss()
 
 # tensorboard logs
-run = "run4"
+run = "run5"
 writer =  SummaryWriter(f'logs/{run}')
 model_path = f"./models/{run}/"
 Path(model_path).mkdir(exist_ok=True)
 
 initial_epochs = 0
-n_epochs = 20
+n_epochs = 50
 
 train(model, data_loaders=data_loaders, data_sizes=data_sizes,
         optimizer=optimizer, criterion=criterion, epochs=n_epochs,
          model_path=model_path, writer=writer, initial_epochs=initial_epochs)
 
-# best_model = r"./models\run2\model.17-0.4847.pt"
+# best_model = r"./models\run4\model.19-0.7621.pt"
 # model.load_state_dict(torch.load(best_model))
 
 test(model, data_loaders=data_loaders, writer=writer)
