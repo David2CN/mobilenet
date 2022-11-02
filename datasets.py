@@ -6,17 +6,16 @@ from torch.utils.data.sampler import SubsetRandomSampler
 
 # transformations
 transform = transforms.Compose([
-    transforms.Resize((224, 224)),
     transforms.ToTensor(),
     transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
 ])
 
 # train and test data
 download = False  # set to true if running for the first time
-train_data = datasets.CIFAR10("data", train=True,
+train_data = datasets.CIFAR10("../data", train=True,
                              download=download, transform=transform)
 
-test_data = datasets.CIFAR10("data", train=False,
+test_data = datasets.CIFAR10("../data", train=False,
                              download=download, transform=transform)
 
 # get validation set

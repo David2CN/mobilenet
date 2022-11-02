@@ -78,7 +78,8 @@ class MobileNet(Module):
         self.dsconv9 = DSConvLayer(1024, 1024, 3, stride=1)
         self.pool = AvgPool2d(7, stride=1)
         self.flatten = Flatten()
-        self.fc = Linear(1024, self.classes)
+        self.fc = Linear(1024, 1000)
+        self.classifier = Linear(1000, self.classes)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -94,4 +95,37 @@ class MobileNet(Module):
         x = self.pool(x)
         x = self.flatten(x)
         x = self.fc(x)
+        x = self.classifier(x)
+        return x
+
+
+
+class MobileNetMini(Module):
+    """
+    mobilenet
+    """
+    def __init__(self, input_dim: int=3, classes: int=10):
+        super().__init__()
+        self.input_dim = input_dim
+        self.classes = classes
+        self.conv1 = Conv2d(self.input_dim, 64, kernel_size=3, stride=2, padding=1)
+        self.dsconv1 = DSConvLayer(64, 128, 3, stride=1)
+        self.dsconv2 = DSConvLayer(128, 256, 3, stride=2)
+        self.dsconv3 = DSConvLayer(256, 512, 3, stride=1)
+        self.dsconv4 = DSConvLayer(512, 512, 3, stride=2)
+        self.pool = AvgPool2d(4, stride=1)
+        self.flatten = Flatten()
+        self.fc = Linear(512, 256)
+        self.classifier = Linear(256, self.classes)
+
+    def forward(self, x):
+        x = self.conv1(x)
+        x = self.dsconv1(x)
+        x = self.dsconv2(x)
+        x = self.dsconv3(x)
+        x = self.dsconv4(x)
+        x = self.pool(x)
+        x = self.flatten(x)
+        x = self.fc(x)
+        x = self.classifier(x)
         return x
