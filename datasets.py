@@ -20,7 +20,7 @@ test_data = datasets.CIFAR10("../data", train=False,
 
 # get validation set
 batch_size = 32
-val_size = 0.2
+val_size = 0.1
 
 num_train = len(train_data)
 indices = list(range(num_train))

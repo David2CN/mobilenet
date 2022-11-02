@@ -1,5 +1,5 @@
 from torch.nn import Module, Conv2d, BatchNorm2d, ModuleList
-from torch.nn import ReLU, AvgPool2d, Linear, Flatten
+from torch.nn import ReLU, AvgPool2d, Linear, Flatten, Dropout
 
 
 class DSConvLayer(Module):
@@ -117,8 +117,9 @@ class MobileNetMini(Module):
         self.dsconv6 = DSConvLayer(1024, 1024, 3, stride=2)
         self.pool = AvgPool2d(2, stride=1)
         self.flatten = Flatten()
-        self.fc = Linear(1024, 1000)
-        self.classifier = Linear(1000, self.classes)
+        self.fc = Linear(1024, 512)
+        self.dropout = Dropout(0.2)
+        self.classifier = Linear(512, self.classes)
 
     def forward(self, x):
         x = self.conv1(x)
@@ -130,6 +131,6 @@ class MobileNetMini(Module):
         x = self.dsconv6(x)
         x = self.pool(x)
         x = self.flatten(x)
-        x = self.fc(x)
+        x = self.dropout(self.fc(x))
         x = self.classifier(x)
         return x

@@ -19,19 +19,19 @@ model = MobileNetMini()
 if cuda:
     model.cuda()
 
-lr = 1e-3
-decay = 1e-4
-optimizer = torch.optim.RMSprop(model.parameters(), lr=lr, weight_decay=decay, momentum=0.9)
+lr = 1e-4
+decay = 1e-2
+optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=decay)
 criterion = torch.nn.CrossEntropyLoss()
 
 # tensorboard logs
-run = "run5"
+run = "run8"
 writer =  SummaryWriter(f'logs/{run}')
 model_path = f"./models/{run}/"
 Path(model_path).mkdir(exist_ok=True)
 
 initial_epochs = 0
-n_epochs = 50
+n_epochs = 30
 
 train(model, data_loaders=data_loaders, data_sizes=data_sizes,
         optimizer=optimizer, criterion=criterion, epochs=n_epochs,
