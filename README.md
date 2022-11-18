@@ -15,11 +15,11 @@ The full mobilenet architecture is shown in the image below. <br>
 
 <img src="assets/mobilenet.jpg">
 
-The implementation was tested on the [CIFAR-10 dataset](https://www.cs.toronto.edu/~kriz/cifar.html).
-After training for 20 epochs, using the RMSProp optimizer with a learning rate of 1e-3, momentum of 0.9 and weight decay of 1e-6.
-20% of the training data was used as a validation set. At the end of 20 epochs, the training and validation accuracies were about 93% and 83% respectively. 
+The implementation was tested on the [CIFAR-10 dataset](https://www.cs.toronto.edu/~kriz/cifar.html), which was upsampled from 32x32 to 224x224. <br>
+After training for 20 epochs, using the Adam optimizer with a learning rate of 1e-2 and weight decay of 1e-5.
+10% of the training data was used as a validation set. At the end of 20 epochs, the training and validation accuracies were about 86.70% and 81.98% respectively. 
 
 <img src="assets/accuracy.jpg" width=40%> <img src="assets/loss.jpg" width=40%>
 
-The model was reloaded with the weights that had the lowest validation loss [epoch 17] and an overall accuracy of <b>84.62%</b> was achieved on the test set.
-The training and validation accuracies at epoch 17 was about 92% and 85% respectively.
+The model was reloaded with the weights that had the lowest validation loss [epoch 16] and an overall accuracy of <b>83.47%</b> was achieved on the test set. <br>
+The training and validation accuracies at epoch 16 was about 85.7% and 83.1% respectively.
