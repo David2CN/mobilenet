@@ -1,10 +1,12 @@
 import torch
 import numpy as np
 from tqdm import tqdm
+from torch.nn import Module
+from torch.optim import Optimizer
+from torch.utils.tensorboard import SummaryWriter
 
-
-def epoch_loop(model, data_loaders: dict,
-                cuda: bool, optimizer, criterion,):
+def epoch_loop(model: Module, data_loaders: dict,
+                cuda: bool, optimizer: Optimizer, criterion: Module):
 
     train_loader = data_loaders["train"]
     val_loader = data_loaders["val"]
@@ -47,9 +49,9 @@ def epoch_loop(model, data_loaders: dict,
     return train_loss, val_loss, train_acc, val_acc
 
 
-def train(model, data_loaders, data_sizes, optimizer, 
-        criterion, epochs, writer=None, model_path="./",
-                initial_epochs=0):
+def train(model: Module, data_loaders: dict, data_sizes: dict, optimizer: Optimizer, 
+        criterion: Module, epochs: int=10, writer: SummaryWriter=None, model_path: str="./",
+                initial_epochs: int=0):
     
     cuda = torch.cuda.is_available()
     
@@ -75,7 +77,7 @@ def train(model, data_loaders, data_sizes, optimizer,
             writer.flush()
 
         
-        print(f"Epoch {epoch}: loss- {train_loss:.3f}, acc- {train_acc:.3f}, val_loss- {val_loss:.3f}, val_acc- {val_acc:.3f}") 
+        print(f"Epoch {epoch}/{epochs}: loss- {train_loss:.3f}, acc- {train_acc:.3f}, val_loss- {val_loss:.3f}, val_acc- {val_acc:.3f}") 
         
         if val_loss <= val_loss_min:
             print(f"val_loss decreased from {val_loss_min:.4f} to {val_loss:.4f}. saving model ...")
@@ -132,3 +134,18 @@ def test(model, data_loaders, writer=None):
         writer.flush()
 
 
+from prettytable import PrettyTable
+
+def count_parameters(model):
+    table = PrettyTable(["Modules", "Parameters"])
+    total_params = 0
+    for name, parameter in model.named_parameters():
+        if not parameter.requires_grad: 
+            continue
+
+        param = parameter.numel()
+        table.add_row([name, param])
+        total_params+=param
+    print(table)
+    print(f"Total Trainable Params: {total_params}")
+    return total_params
