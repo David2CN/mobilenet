@@ -1,6 +1,6 @@
 import torch
 from torch.nn import Module, Conv2d, BatchNorm2d, ModuleList
-from torch.nn import ReLU, AvgPool2d, Linear, Flatten, Upsample, Softmax
+from torch.nn import ReLU, AvgPool2d, Linear, Flatten, Upsample
 
 
 class DSConvLayer(Module):
@@ -82,7 +82,6 @@ class MobileNet(Module):
         self.pool = AvgPool2d(7, stride=1)
         self.flatten = Flatten()
         self.fc = Linear(1024, self.classes)
-        self.classifier = Softmax(dim=1)
 
     def forward(self, x: torch.Tensor) -> torch.Tensor:
         
@@ -102,5 +101,4 @@ class MobileNet(Module):
         x = self.pool(x)
         x = self.flatten(x)
         x = self.fc(x)
-        x = self.classifier(x)
         return x
