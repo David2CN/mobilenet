@@ -3,21 +3,8 @@ from torchvision import datasets, transforms
 from torch.utils.data import DataLoader, Dataset
 from torch.utils.data.sampler import SubsetRandomSampler
 from tqdm import tqdm
+from torch.utils.data import ConcatDataset
 
-
-# transformations
-transform = transforms.Compose([
-    transforms.ToTensor(),
-    transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
-])
-
-# train and test data
-download = False  # set to true if running for the first time
-train_data = datasets.CIFAR10("../data", train=True,
-                             download=download, transform=transform)
-
-test_data = datasets.CIFAR10("../data", train=False,
-                             download=download, transform=transform)
 
 def augment_data(data):
     transformed_imgs = []
@@ -55,9 +42,30 @@ class AugDataset(Dataset):
 
 
 # get validation set and loaders
-def get_loaders(data, batch_size: int=32, val_size: float=0.1):
+def get_dataloaders(batch_size: int=32, val_size: float=0.1, 
+                    download: bool=False, data_dir: str="../data",
+                    transform=None, augment: bool=False):
     
-    num_train = len(data)
+    if not transform:
+        transform = transforms.Compose([
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
+        ])
+
+    # train and test data
+    train_data = datasets.CIFAR10(data_dir, train=True,
+                                download=download, transform=transform)
+
+    test_data = datasets.CIFAR10(data_dir, train=False,
+                                download=download, transform=transform)
+
+    if augment:
+        # augment train data
+        aug_train = augment_data(train_data)
+        aug_dataset = AugDataset(*aug_train)
+        train_data = ConcatDataset((train_data, aug_dataset))
+
+    num_train = len(train_data)
     indices = list(range(num_train))
     np.random.shuffle(indices)
     
@@ -68,8 +76,8 @@ def get_loaders(data, batch_size: int=32, val_size: float=0.1):
     val_sampler = SubsetRandomSampler(val_idx)
     
     # create dataloaders
-    train_loader = DataLoader(data, batch_size=batch_size, sampler=train_sampler)
-    val_loader = DataLoader(data, batch_size=batch_size, sampler=val_sampler)
+    train_loader = DataLoader(train_data, batch_size=batch_size, sampler=train_sampler)
+    val_loader = DataLoader(train_data, batch_size=batch_size, sampler=val_sampler)
     test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=False)
 
     data_loaders = {
@@ -86,6 +94,3 @@ def get_loaders(data, batch_size: int=32, val_size: float=0.1):
 
     return data_loaders, data_sizes
 
-if __name__=="__main__":
-    # print(data_sizes)
-    print()
